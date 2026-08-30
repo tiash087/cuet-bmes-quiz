@@ -180,19 +180,29 @@ class QuizApp {
       this.loadLeaderboard();
     });
 
-    // Keyboard Shortcuts (1-4, A-D, Space)
+    // Keyboard Shortcuts (1-4, A-D, Space) with dynamic display mapping
     window.addEventListener('keydown', (e) => {
       const activeView = document.querySelector('.app-view:not(.hidden)');
       if (!activeView || activeView.id !== 'view-quiz' || this.isSubmitting) return;
 
       const key = e.key.toUpperCase();
-      if (['1', 'A'].includes(key)) this.handleAnswer('A');
-      else if (['2', 'B'].includes(key)) this.handleAnswer('B');
-      else if (['3', 'C'].includes(key)) this.handleAnswer('C');
-      else if (['4', 'D'].includes(key)) this.handleAnswer('D');
+      let targetDisplay = null;
+      if (['1', 'A'].includes(key)) targetDisplay = 'A';
+      else if (['2', 'B'].includes(key)) targetDisplay = 'B';
+      else if (['3', 'C'].includes(key)) targetDisplay = 'C';
+      else if (['4', 'D'].includes(key)) targetDisplay = 'D';
       else if (e.code === 'Space') {
         e.preventDefault();
         this.handleAnswer('SKIP');
+        return;
+      }
+
+      if (targetDisplay && this.currentRenderedOptions) {
+        const matched = this.currentRenderedOptions.find(o => o.displayKey === targetDisplay);
+        if (matched) {
+          const btn = document.querySelector(`[data-display-key="${targetDisplay}"]`);
+          this.handleAnswer(matched.originalKey, btn);
+        }
       }
     });
   }
@@ -321,6 +331,9 @@ class QuizApp {
       return;
     }
 
+    // Randomize question sequence for this participant
+    this.questions = this.shuffleArray(this.questions);
+
     // Reset game state
     this.currentIndex = 0;
     this.timeRemaining = this.timeLimit;
@@ -414,8 +427,9 @@ class QuizApp {
 
   renderCurrentQuestion() {
     if (this.currentIndex >= this.questions.length) {
-      // Cycled through all questions, loop or finish
-      this.currentIndex = 0; // loop with shuffle if participant answered all
+      // Cycled through all questions, loop with fresh shuffle
+      this.currentIndex = 0;
+      this.questions = this.shuffleArray(this.questions);
     }
 
     const q = this.questions[this.currentIndex];
@@ -429,21 +443,35 @@ class QuizApp {
     const optionsContainer = document.getElementById('q-options-container');
     optionsContainer.innerHTML = '';
 
-    const options = [
-      { key: 'A', text: q.option_a },
-      { key: 'B', text: q.option_b },
-      { key: 'C', text: q.option_c },
-      { key: 'D', text: q.option_d }
+    // Original options with their database keys
+    const rawOptions = [
+      { originalKey: 'A', text: q.option_a },
+      { originalKey: 'B', text: q.option_b },
+      { originalKey: 'C', text: q.option_c },
+      { originalKey: 'D', text: q.option_d }
     ];
 
-    options.forEach(opt => {
+    // Randomize / Shuffle options for this question
+    const shuffledOptions = this.shuffleArray(rawOptions);
+    const displayLabels = ['A', 'B', 'C', 'D'];
+    this.currentRenderedOptions = [];
+
+    shuffledOptions.forEach((opt, idx) => {
+      const displayKey = displayLabels[idx];
+      this.currentRenderedOptions.push({
+        displayKey: displayKey,
+        originalKey: opt.originalKey,
+        text: opt.text
+      });
+
       const btn = document.createElement('button');
       btn.className = `quiz-option-btn w-full p-4 rounded-xl text-left flex items-center justify-between group transition-all`;
-      btn.dataset.option = opt.key;
+      btn.dataset.displayKey = displayKey;
+      btn.dataset.originalKey = opt.originalKey;
       btn.innerHTML = `
         <div class="flex items-center space-x-3.5 pointer-events-none">
           <span class="w-8 h-8 rounded-lg bg-slate-800/80 border border-slate-700 text-cyan-400 font-bold flex items-center justify-center text-sm group-hover:border-cyan-400 group-hover:bg-cyan-500/10 transition-colors">
-            ${opt.key}
+            ${displayKey}
           </span>
           <span class="text-slate-200 text-sm sm:text-base font-medium">${this.escapeHtml(opt.text)}</span>
         </div>
@@ -452,7 +480,7 @@ class QuizApp {
 
       btn.addEventListener('click', () => {
         if (!this.isSubmitting) {
-          this.handleAnswer(opt.key, btn);
+          this.handleAnswer(opt.originalKey, btn);
         }
       });
 
@@ -855,6 +883,16 @@ class QuizApp {
     return str.replace(/[&<>'"]/g, 
       tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
     );
+  }
+
+  shuffleArray(array) {
+    if (!array || !Array.isArray(array)) return [];
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
   }
 }
 

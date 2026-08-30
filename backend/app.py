@@ -180,6 +180,11 @@ def get_session_questions(session_id: str):
     hard_qs = [dict(r) for r in cursor.fetchall()]
     conn.close()
 
+    # Randomly shuffle each bucket per session
+    random.shuffle(easy_qs)
+    random.shuffle(med_qs)
+    random.shuffle(hard_qs)
+
     # Interleave in a balanced mixed sequence: Easy -> Medium -> Easy -> Hard -> Medium ...
     mixed_questions = []
     e_idx, m_idx, h_idx = 0, 0, 0
