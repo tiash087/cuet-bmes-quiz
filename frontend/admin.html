@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CUET BMES Quiz - Admin & Question Bank Portal</title>
+  
+  <!-- Performance Preconnects -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest" defer></script>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-[#070d19] text-slate-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-black">
+
+  <!-- ================= ADMIN LOGIN VIEW ================= -->
+  <div id="admin-login-view" class="flex-grow flex items-center justify-center p-4">
+    <div class="glass-panel max-w-md w-full p-8 rounded-3xl relative overflow-hidden text-center">
+      <div class="w-14 h-14 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-cyan-500/20">
+        <i data-lucide="shield-lock" class="w-7 h-7"></i>
+      </div>
+      
+      <h1 class="text-2xl font-extrabold text-white mb-1">Admin Portal</h1>
+      <p class="text-xs text-slate-400 mb-6">CUET BMES Quiz Control & Question Manager</p>
+
+      <form id="form-admin-login" class="space-y-4">
+        <div class="text-left">
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Admin Password</label>
+          <input type="password" id="admin-pass-input" required placeholder="Enter admin password"
+            class="glass-input w-full px-4 py-3 rounded-xl text-sm">
+        </div>
+
+        <div id="admin-login-error" class="hidden p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-medium"></div>
+
+        <button type="submit" class="w-full py-3.5 px-6 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-sm shadow-lg shadow-cyan-500/25 transition-all">
+          Unlock Admin Dashboard
+        </button>
+      </form>
+
+      <div class="mt-6 pt-4 border-t border-slate-800 text-center">
+        <a href="/" class="text-xs text-slate-400 hover:text-cyan-400 transition-colors">
+          &larr; Return to Participant Quiz Screen
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ADMIN DASHBOARD VIEW ================= -->
+  <div id="admin-dashboard-view" class="hidden flex-grow flex flex-col">
+    
+    <!-- Top Admin Header -->
+    <header class="sticky top-0 z-40 border-b border-slate-800 bg-[#070d19]/90 backdrop-blur-md">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        
+        <div class="flex items-center space-x-3">
+          <div class="h-10 px-1.5 py-1 rounded-xl bg-white/95 border border-cyan-500/30 shadow-md flex items-center justify-center">
+            <img src="/assets/cuet_bmes_logo.png" alt="CUET BMES Official Logo" class="h-full w-auto max-h-8 object-contain rounded-lg">
+          </div>
+          <div>
+            <h1 class="font-bold text-sm sm:text-base text-white">CUET BMES Admin Console</h1>
+            <span class="text-[10px] text-cyan-400 font-mono">Status: Connected</span>
+          </div>
+        </div>
+
+        <!-- Quick Stats Pill -->
+        <div class="hidden md:flex items-center space-x-3 text-xs">
+          <div class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300">
+            Questions: <strong id="stat-total-q" class="text-cyan-400 font-tech">0</strong>
+          </div>
+          <div class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300">
+            Participants: <strong id="stat-total-participants" class="text-emerald-400 font-tech">0</strong>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center space-x-2">
+          <button id="btn-admin-qr" class="px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 text-xs font-semibold flex items-center space-x-1.5 transition-colors" title="View & Download QR Codes">
+            <i data-lucide="qr-code" class="w-3.5 h-3.5"></i>
+            <span>QR Codes</span>
+          </button>
+          <a href="/" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold flex items-center space-x-1.5 transition-colors">
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            <span>Open Quiz App</span>
+          </a>
+          <button id="btn-admin-logout" class="px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 text-xs font-semibold flex items-center space-x-1.5 transition-colors">
+            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+            <span>Logout</span>
+          </button>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Admin Body -->
+    <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow">
+      
+      <!-- Tab Navigation -->
+      <div class="flex items-center space-x-2 border-b border-slate-800 pb-4 mb-6 overflow-x-auto">
+        <button class="admin-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border border-transparent transition-all flex items-center space-x-2" data-tab="tab-questions">
+          <i data-lucide="help-circle" class="w-4 h-4"></i>
+          <span>Question Bank</span>
+        </button>
+
+        <button class="admin-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border border-transparent transition-all flex items-center space-x-2" data-tab="tab-results">
+          <i data-lucide="trophy" class="w-4 h-4"></i>
+          <span>Results & Leaderboard</span>
+        </button>
+
+        <button class="admin-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border border-transparent transition-all flex items-center space-x-2" data-tab="tab-settings">
+          <i data-lucide="sliders" class="w-4 h-4"></i>
+          <span>Competition Settings</span>
+        </button>
+      </div>
+
+      <!-- ================= TAB 1: QUESTIONS BANK ================= -->
+      <div id="tab-questions" class="admin-tab-content space-y-4">
+        
+        <!-- Controls Bar -->
+        <div class="glass-panel p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="flex items-center space-x-3 w-full sm:w-auto">
+            <div class="relative flex-grow sm:w-64">
+              <input type="text" id="search-admin-q" placeholder="Search questions..."
+                class="glass-input w-full px-3 py-1.5 pl-8 rounded-xl text-xs">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"></i>
+            </div>
+            <select id="filter-category" class="glass-input px-3 py-1.5 rounded-xl text-xs text-slate-300">
+              <option value="ALL">All Categories</option>
+              <option value="Biomedical Signals">Biomedical Signals</option>
+              <option value="Medical Imaging">Medical Imaging</option>
+              <option value="Biomaterials">Biomaterials</option>
+              <option value="Biosensors">Biosensors</option>
+              <option value="Medical Devices">Medical Devices</option>
+              <option value="CUET Trivia">CUET Trivia</option>
+              <option value="General BMES">General BMES</option>
+            </select>
+          </div>
+
+          <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+            <button id="btn-open-bulk-import" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold flex items-center space-x-1.5 transition-colors">
+              <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+              <span>Bulk JSON</span>
+            </button>
+            <button id="btn-open-add-q" class="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold flex items-center space-x-1.5 shadow-md transition-colors">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Add Question</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Questions Table -->
+        <div class="glass-panel rounded-2xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-800 text-[11px] uppercase font-bold text-slate-400 tracking-wider bg-slate-900/50">
+                  <th class="py-3 px-4 text-center">ID</th>
+                  <th class="py-3 px-4">Question & Options</th>
+                  <th class="py-3 px-4 text-center">Correct</th>
+                  <th class="py-3 px-4">Category</th>
+                  <th class="py-3 px-4 text-center">Difficulty</th>
+                  <th class="py-3 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-questions-tbody" class="divide-y divide-slate-800/40">
+                <!-- Injected via admin.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================= TAB 2: RESULTS & LEADERBOARD ================= -->
+      <div id="tab-results" class="admin-tab-content hidden space-y-4">
+        
+        <div class="glass-panel p-4 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-3">
+          <div>
+            <h3 class="font-bold text-sm text-white flex items-center space-x-2">
+              <i data-lucide="trophy" class="w-4 h-4 text-amber-400"></i>
+              <span>Participant Submissions & Leaderboard</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Real-time standings with safe wipe & instant undo restore options</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Export CSV -->
+            <button id="btn-export-csv" class="px-3.5 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center space-x-1.5 transition-colors">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span>Download CSV</span>
+            </button>
+            
+            <!-- Undo Wipe / Restore Button -->
+            <button id="btn-undo-leaderboard" class="px-3.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold flex items-center space-x-1.5 transition-colors" title="Restore previous wiped leaderboard data">
+              <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+              <span>Undo Wipe / Restore</span>
+              <span id="backup-badge" class="hidden ml-1 px-1.5 py-0.5 bg-amber-500/40 text-amber-200 text-[10px] rounded-full font-mono font-bold">0</span>
+            </button>
+
+            <!-- Wipe Leaderboard Button -->
+            <button id="btn-reset-leaderboard" class="px-3.5 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 text-xs font-bold flex items-center space-x-1.5 transition-colors" title="Wipe current leaderboard scores (backed up automatically)">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+              <span>Wipe Leaderboard</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-panel rounded-2xl overflow-hidden shadow-xl border border-slate-800">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-800 text-[11px] uppercase font-bold text-slate-400 tracking-wider bg-slate-900/60">
+                  <th class="py-3 px-4 text-center">Rank</th>
+                  <th class="py-3 px-4">Participant</th>
+                  <th class="py-3 px-4">Student ID</th>
+                  <th class="py-3 px-4">Dept & Batch</th>
+                  <th class="py-3 px-4 text-center">Score</th>
+                  <th class="py-3 px-4 text-center">Correct / Total</th>
+                  <th class="py-3 px-4 text-center">Accuracy</th>
+                  <th class="py-3 px-4 text-center">Time</th>
+                  <th class="py-3 px-4">Completed At</th>
+                  <th class="py-3 px-4 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="admin-results-tbody" class="divide-y divide-slate-800/40">
+                <!-- Injected via admin.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================= TAB 3: COMPETITION SETTINGS ================= -->
+      <div id="tab-settings" class="admin-tab-content hidden">
+        <div class="glass-panel max-w-2xl mx-auto p-6 sm:p-8 rounded-3xl">
+          <h3 class="font-bold text-lg text-white mb-1">Competition Rules & Settings</h3>
+          <p class="text-xs text-slate-400 mb-6">Modify quiz behavior, timer duration, scoring, and security</p>
+
+          <form id="form-admin-settings" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Competition Title</label>
+              <input type="text" id="set-title" required class="glass-input w-full px-4 py-2.5 rounded-xl text-sm">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Duration (Seconds)</label>
+                <input type="number" id="set-duration" min="10" max="600" required class="glass-input w-full px-4 py-2.5 rounded-xl text-sm font-tech">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Points per Correct</label>
+                <input type="number" id="set-positive" min="1" max="100" required class="glass-input w-full px-4 py-2.5 rounded-xl text-sm font-tech">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Points per Wrong</label>
+                <input type="number" id="set-negative" min="0" max="100" required class="glass-input w-full px-4 py-2.5 rounded-xl text-sm font-tech">
+              </div>
+            </div>
+
+            <div class="space-y-3 pt-2">
+              <label class="flex items-center space-x-3 cursor-pointer">
+                <input type="checkbox" id="set-allow-negative" class="w-4 h-4 rounded text-cyan-500 bg-slate-900 border-slate-700">
+                <span class="text-sm text-slate-300">Enable Negative Marking</span>
+              </label>
+
+              <label class="flex items-center space-x-3 cursor-pointer">
+                <input type="checkbox" id="set-allow-retakes" class="w-4 h-4 rounded text-cyan-500 bg-slate-900 border-slate-700">
+                <span class="text-sm text-slate-300">Allow Multiple Attempts per Student ID</span>
+              </label>
+            </div>
+
+            <div class="pt-4 border-t border-slate-800">
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Change Admin Password (Leave blank to keep current)</label>
+              <input type="password" id="set-new-pass" placeholder="New admin password" class="glass-input w-full px-4 py-2.5 rounded-xl text-sm">
+            </div>
+
+            <button type="submit" class="w-full py-3.5 px-6 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-sm shadow-lg shadow-cyan-500/25 transition-all">
+              Save Competition Settings
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- ================= ADD / EDIT QUESTION MODAL ================= -->
+  <div id="modal-question" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden overflow-y-auto">
+    <div class="glass-panel max-w-xl w-full p-6 sm:p-7 rounded-3xl border border-slate-700 my-8">
+      
+      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+        <h3 id="q-modal-title" class="font-bold text-lg text-white">Add Question</h3>
+        <button id="btn-close-q-modal" class="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-question-modal" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Question Text *</label>
+          <textarea id="modal-q-text" rows="3" required placeholder="Type the question..." class="glass-input w-full px-3.5 py-2.5 rounded-xl text-sm"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Option A *</label>
+            <input type="text" id="modal-opt-a" required placeholder="Option A" class="glass-input w-full px-3.5 py-2 rounded-xl text-xs">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Option B *</label>
+            <input type="text" id="modal-opt-b" required placeholder="Option B" class="glass-input w-full px-3.5 py-2 rounded-xl text-xs">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Option C *</label>
+            <input type="text" id="modal-opt-c" required placeholder="Option C" class="glass-input w-full px-3.5 py-2 rounded-xl text-xs">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Option D *</label>
+            <input type="text" id="modal-opt-d" required placeholder="Option D" class="glass-input w-full px-3.5 py-2 rounded-xl text-xs">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Correct Ans *</label>
+            <select id="modal-correct-opt" required class="glass-input w-full px-3 py-2 rounded-xl text-xs text-cyan-300 font-bold">
+              <option value="A">Option A</option>
+              <option value="B">Option B</option>
+              <option value="C">Option C</option>
+              <option value="D">Option D</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Category</label>
+            <input type="text" id="modal-category" placeholder="e.g. Biosensors" class="glass-input w-full px-3 py-2 rounded-xl text-xs">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Difficulty</label>
+            <select id="modal-difficulty" class="glass-input w-full px-3 py-2 rounded-xl text-xs">
+              <option value="Easy">Easy</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="Hard">Hard</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Explanation (Optional)</label>
+          <input type="text" id="modal-explanation" placeholder="Brief rationale for the correct answer" class="glass-input w-full px-3.5 py-2 rounded-xl text-xs">
+        </div>
+
+        <div class="pt-3 border-t border-slate-800 flex items-center justify-end space-x-2">
+          <button type="button" onclick="document.getElementById('modal-question').classList.add('hidden')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-cyan-500 text-slate-950 font-bold text-xs hover:bg-cyan-400">
+            Save Question
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= BULK IMPORT JSON MODAL ================= -->
+  <div id="modal-bulk-import" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden">
+    <div class="glass-panel max-w-xl w-full p-6 sm:p-7 rounded-3xl border border-slate-700">
+      
+      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+        <h3 class="font-bold text-lg text-white">Bulk Question Import (JSON)</h3>
+        <button id="btn-close-bulk-modal" class="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-400 mb-3">Paste a valid JSON array of questions with schema:</p>
+      <pre class="bg-slate-950 p-3 rounded-xl text-[11px] text-cyan-300 font-mono overflow-x-auto mb-3 border border-slate-800">
+[
+  {
+    "question_text": "Sample question?",
+    "option_a": "A", "option_b": "B", "option_c": "C", "option_d": "D",
+    "correct_option": "A",
+    "category": "Biomedical",
+    "difficulty": "Easy"
+  }
+]</pre>
+
+      <textarea id="bulk-import-textarea" rows="6" placeholder="Paste JSON here..." class="glass-input w-full p-3 rounded-xl text-xs font-mono mb-4"></textarea>
+
+      <div class="flex items-center justify-end space-x-2">
+        <button type="button" onclick="document.getElementById('modal-bulk-import').classList.add('hidden')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold">
+          Cancel
+        </button>
+        <button id="btn-submit-bulk-import" class="px-5 py-2 rounded-xl bg-cyan-500 text-slate-950 font-bold text-xs hover:bg-cyan-400">
+          Import Questions
+        </button>
+  <!-- ================= DUAL QR CODE MODAL ================= -->
+  <div id="modal-admin-qr" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md hidden">
+    <div class="glass-panel max-w-2xl w-full p-6 sm:p-7 rounded-3xl border border-cyan-500/40 text-center relative shadow-2xl">
+      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="qr-code" class="w-5 h-5 text-cyan-400"></i>
+          <h3 class="font-bold text-lg text-white">Event QR Codes</h3>
+        </div>
+        <button onclick="document.getElementById('modal-admin-qr').classList.add('hidden')" class="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-3">
+        <!-- Player QR -->
+        <div class="p-4 rounded-2xl bg-slate-900/90 border border-cyan-500/30 text-center">
+          <span class="px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 text-[11px] font-bold uppercase tracking-wider mb-2 inline-block">1. Player Quiz Link</span>
+          <div class="p-3 bg-white rounded-xl inline-block my-2 shadow-md">
+            <img src="/assets/qr_player_quiz_standard.png" alt="Player QR" class="w-40 h-40 object-contain mx-auto">
+          </div>
+          <p class="text-xs text-slate-300 font-mono break-all mt-1">https://indoor-ingredients-task-aruba.trycloudflare.com</p>
+          <a href="/assets/qr_player_quiz_standard.png" download="CUET_BMES_Player_QR.png" class="mt-3 inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30 text-xs font-semibold">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span>Download Player QR</span>
+          </a>
+        </div>
+
+        <!-- Admin QR -->
+        <div class="p-4 rounded-2xl bg-slate-900/90 border border-amber-500/30 text-center">
+          <span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 text-[11px] font-bold uppercase tracking-wider mb-2 inline-block">2. Admin Portal Link</span>
+          <div class="p-3 bg-white rounded-xl inline-block my-2 shadow-md">
+            <img src="/assets/qr_admin_portal_standard.png" alt="Admin QR" class="w-40 h-40 object-contain mx-auto">
+          </div>
+          <p class="text-xs text-slate-300 font-mono break-all mt-1">https://indoor-ingredients-task-aruba.trycloudflare.com/admin</p>
+          <a href="/assets/qr_admin_portal_standard.png" download="CUET_BMES_Admin_QR.png" class="mt-3 inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 text-xs font-semibold">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span>Download Admin QR</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="mt-4 pt-3 border-t border-slate-800 text-right">
+        <button onclick="document.getElementById('modal-admin-qr').classList.add('hidden')" class="px-5 py-2 rounded-xl bg-cyan-500 text-slate-950 font-bold text-xs hover:bg-cyan-400">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Toast Notification with Undo Action -->
+  <div id="admin-toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 max-w-md w-full pointer-events-none">
+    <div class="glass-panel p-4 rounded-2xl border border-cyan-500/40 shadow-2xl flex items-center justify-between pointer-events-auto">
+      <div class="flex items-center space-x-3 text-xs sm:text-sm">
+        <i id="toast-icon" data-lucide="info" class="w-5 h-5 text-cyan-400 flex-shrink-0"></i>
+        <span id="toast-message" class="text-slate-200 font-medium">Notification</span>
+      </div>
+      <div id="toast-actions" class="ml-3 flex items-center space-x-2">
+        <button id="toast-undo-btn" class="hidden px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-colors shadow-sm">
+          Undo
+        </button>
+        <button id="toast-close-btn" class="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/admin.js"></script>
+  <script>
+    if (window.lucide) lucide.createIcons();
+  </script>
+</body>
+</html>

@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CUET BMES 2 Min Blitz Quiz Competition</title>
+  
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="CUET BMES 2 Min Blitz Quiz Competition">
+  <meta name="description" content="Official CUET BMES 2-Minute Blitz Quiz Competition - Test your speed and biomedical engineering knowledge!">
+  
+  <!-- Open Graph / Facebook / WhatsApp / Messenger -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="CUET BMES">
+  <meta property="og:title" content="CUET BMES 2 Min Blitz Quiz Competition">
+  <meta property="og:description" content="Official CUET BMES Speed Quiz Challenge. 2 Minutes (120s) countdown, live leaderboard & instant rankings!">
+  <meta property="og:url" content="https://indoor-ingredients-task-aruba.trycloudflare.com">
+  <meta property="og:image" content="https://indoor-ingredients-task-aruba.trycloudflare.com/assets/cuet_bmes_logo.png">
+  <meta property="og:image:secure_url" content="https://indoor-ingredients-task-aruba.trycloudflare.com/assets/cuet_bmes_logo.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="600">
+  <meta property="og:image:height" content="300">
+  <meta property="og:image:alt" content="CUET BMES Logo">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CUET BMES 2 Min Blitz Quiz Competition">
+  <meta name="twitter:description" content="Official CUET BMES Speed Quiz Challenge. 2 Minutes (120s) countdown, live leaderboard & instant rankings!">
+  <meta name="twitter:image" content="https://indoor-ingredients-task-aruba.trycloudflare.com/assets/cuet_bmes_logo.png">
+  
+  <!-- Performance Preconnects & Asset Preloads -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="image" href="/assets/cuet_bmes_logo.png">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest" defer></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js" defer></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-[#070d19] text-slate-100 flex flex-col min-h-screen selection:bg-cyan-500 selection:text-black">
+
+  <!-- ================= TOP NAVIGATION ================= -->
+  <header class="sticky top-0 z-40 w-full border-b border-slate-800/80 bg-[#070d19]/80 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <a href="#" id="nav-home" class="flex items-center space-x-3 group">
+        <div class="h-10 sm:h-11 px-1.5 py-1 rounded-xl bg-white/95 border border-cyan-500/40 shadow-lg shadow-cyan-500/20 group-hover:scale-105 group-hover:border-cyan-400 group-hover:shadow-cyan-500/40 transition-all flex items-center justify-center">
+          <img src="/assets/cuet_bmes_logo.png" alt="CUET BMES Official Logo" class="h-full w-auto max-h-8 sm:max-h-9 object-contain rounded-lg">
+        </div>
+        <div>
+          <div class="flex items-center space-x-1.5">
+            <span class="font-extrabold text-lg sm:text-xl tracking-tight bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent">CUET BMES</span>
+            <span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 uppercase">Quiz Blitz</span>
+          </div>
+          <p class="text-[11px] text-slate-400 hidden sm:block">Biomedical Engineering Society, CUET</p>
+        </div>
+      </a>
+
+      <!-- Quick Action Buttons -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Sound Toggle -->
+        <button id="btn-toggle-sound" class="p-2 sm:px-3 sm:py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 flex items-center space-x-1.5 text-sm transition-colors" title="Toggle Sound Effects">
+          <i data-lucide="volume-2" class="w-5 h-5 text-cyan-400"></i>
+          <span class="hidden sm:inline text-xs text-cyan-300">Sound ON</span>
+        </button>
+
+        <!-- Rules Button -->
+        <button id="btn-rules" class="p-2 sm:px-3 sm:py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 flex items-center space-x-1.5 text-sm text-slate-300 hover:text-white transition-colors">
+          <i data-lucide="help-circle" class="w-5 h-5 text-amber-400"></i>
+          <span class="hidden sm:inline text-xs font-medium">Rules</span>
+        </button>
+
+        <!-- Live Leaderboard Nav -->
+        <button id="nav-leaderboard" class="px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 flex items-center space-x-1.5 text-xs sm:text-sm font-semibold transition-all">
+          <i data-lucide="trophy" class="w-4 h-4 text-amber-400"></i>
+          <span>Leaderboard</span>
+        </button>
+
+        <!-- QR Code Button for live events -->
+        <button id="btn-show-qr" class="p-2 sm:px-3 sm:py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 flex items-center space-x-1.5 text-sm text-cyan-300 hover:text-white transition-colors" title="Scan QR Code to Join">
+          <i data-lucide="qr-code" class="w-4 h-4 text-cyan-400"></i>
+          <span class="hidden sm:inline text-xs font-semibold">Join QR</span>
+        </button>
+
+        <!-- Admin Portal link -->
+        <a href="/admin" target="_blank" class="p-2 rounded-lg bg-slate-800/40 hover:bg-slate-800 border border-slate-700/50 text-slate-400 hover:text-slate-200 transition-colors" title="Admin Portal">
+          <i data-lucide="shield-check" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTAINER ================= -->
+  <main class="flex-grow max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-10 flex flex-col justify-center">
+
+    <!-- ================= VIEW 1: REGISTRATION & HERO ================= -->
+    <div id="view-register" class="app-view">
+      
+      <!-- Hero Banner Header -->
+      <div class="text-center max-w-2xl mx-auto mb-8">
+        <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-xs font-medium mb-4 shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>Official CUET BMES Speed Quiz Challenge</span>
+        </div>
+        <h1 class="conf-title text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-3">
+          CUET BMES 2-Minute Blitz Quiz
+        </h1>
+        <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+          Speed, precision & knowledge! Answer as many Biomedical Engineering & general science questions as you can in <span class="text-cyan-300 font-bold conf-duration">2 Minutes (120s)</span>.
+        </p>
+      </div>
+
+      <!-- Registration Glass Card -->
+      <div class="max-w-lg mx-auto glass-panel p-6 sm:p-8 rounded-3xl relative overflow-hidden">
+        <div class="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+        <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-slate-800">
+          <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+            <i data-lucide="user-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-lg text-white">Participant Entry</h2>
+            <p class="text-xs text-slate-400">Enter your credentials to begin the competition</p>
+          </div>
+        </div>
+
+        <form id="form-register" class="space-y-4">
+          <!-- Full Name -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Full Name *</label>
+            <div class="relative">
+              <input type="text" id="reg-name" required placeholder="e.g. Tanvir Ahmed" 
+                class="glass-input w-full px-4 py-3 rounded-xl text-sm pl-10 focus:ring-0">
+              <i data-lucide="user" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5"></i>
+            </div>
+          </div>
+
+          <!-- Student ID -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Student ID *</label>
+            <div class="relative">
+              <input type="text" id="reg-id" required placeholder="e.g. 1908001 / 2008012" 
+                class="glass-input w-full px-4 py-3 rounded-xl text-sm pl-10 uppercase focus:ring-0">
+              <i data-lucide="credit-card" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5"></i>
+            </div>
+          </div>
+
+          <!-- Department & Batch Grid -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Dept.</label>
+              <input type="text" id="reg-dept" value="BME" placeholder="BME / EEE / ME" 
+                class="glass-input w-full px-4 py-2.5 rounded-xl text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Batch</label>
+              <input type="text" id="reg-batch" placeholder="'19, '20, '21..." 
+                class="glass-input w-full px-4 py-2.5 rounded-xl text-sm">
+            </div>
+          </div>
+
+          <!-- Optional Contact -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Email (Optional)</label>
+              <input type="email" id="reg-email" placeholder="name@cuet.ac.bd" 
+                class="glass-input w-full px-4 py-2.5 rounded-xl text-xs">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Phone (Optional)</label>
+              <input type="tel" id="reg-phone" placeholder="017xxxxxxxx" 
+                class="glass-input w-full px-4 py-2.5 rounded-xl text-xs">
+            </div>
+          </div>
+
+          <!-- Error Feedback -->
+          <div id="reg-error" class="hidden p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-medium"></div>
+
+          <!-- Submit Button -->
+          <button type="submit" id="btn-submit-reg" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-bold text-sm sm:text-base flex items-center justify-center space-x-2 shadow-lg shadow-cyan-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0">
+            <span>Continue to Quiz</span>
+            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+          </button>
+        </form>
+
+        <!-- Live Podium Shortcut Banner -->
+        <div class="mt-6 pt-4 border-t border-slate-800/80 text-center">
+          <button id="btn-hero-leaderboard" class="text-xs text-slate-400 hover:text-cyan-400 transition-colors inline-flex items-center space-x-1.5">
+            <i data-lucide="trophy" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span>Check the current live leader scores & rankings</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= VIEW 2: PRE-QUIZ INSTRUCTIONS ================= -->
+    <div id="view-instructions" class="app-view hidden">
+      <div class="max-w-xl mx-auto glass-panel p-6 sm:p-8 rounded-3xl relative overflow-hidden">
+        
+        <div class="text-center mb-6">
+          <div class="w-14 h-14 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-cyan-500/20">
+            <i data-lucide="timer" class="w-7 h-7"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-white">Ready for the 2-Minute Blitz?</h2>
+          <p class="text-xs sm:text-sm text-slate-400 mt-1">Hello <span id="inst-name" class="text-cyan-300 font-semibold"></span> (<span id="inst-id" class="font-mono text-slate-300"></span>)</p>
+        </div>
+
+        <!-- Rules Checklist -->
+        <div class="space-y-3 bg-slate-900/60 p-4 sm:p-5 rounded-2xl border border-slate-800 mb-6">
+          <div class="flex items-start space-x-3 text-xs sm:text-sm text-slate-300">
+            <i data-lucide="clock" class="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5"></i>
+            <span><strong>Time Limit:</strong> You have strictly <span id="inst-duration" class="text-cyan-300 font-bold">2 Minutes (120s)</span>. The timer ticks continuously once started.</span>
+          </div>
+
+          <div class="flex items-start space-x-3 text-xs sm:text-sm text-slate-300">
+            <i data-lucide="zap" class="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5"></i>
+            <span><strong>Scoring:</strong> <span id="inst-pos" class="text-emerald-400 font-bold">+4</span> for correct answer, <span id="inst-neg" class="text-rose-400 font-bold">-1</span> for incorrect answer.</span>
+          </div>
+
+          <div class="flex items-start space-x-3 text-xs sm:text-sm text-slate-300">
+            <i data-lucide="flame" class="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5"></i>
+            <span><strong>Streak Bonus:</strong> Consecutive correct answers earn streak combos for ultimate leaderboard glory!</span>
+          </div>
+
+          <div class="flex items-start space-x-3 text-xs sm:text-sm text-slate-300">
+            <i data-lucide="keyboard" class="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5"></i>
+            <span><strong>Pro Tip:</strong> You can click the options or press <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-[10px] text-cyan-300">A</kbd> <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-[10px] text-cyan-300">B</kbd> <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-[10px] text-cyan-300">C</kbd> <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-[10px] text-cyan-300">D</kbd> or <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-[10px] text-cyan-300">Space</kbd> for rapid answering!</span>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between text-xs text-slate-400 mb-6 px-1">
+          <span>Question Bank: <strong id="inst-total-q" class="text-slate-200">30+</strong></span>
+          <span>Leaderboard: <strong class="text-emerald-400">Live</strong></span>
+        </div>
+
+        <!-- Launch Button -->
+        <button id="btn-start-blitz" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black text-base sm:text-lg flex items-center justify-center space-x-2 shadow-xl shadow-teal-500/25 transition-all transform hover:scale-[1.02] active:scale-100">
+          <i data-lucide="play" class="w-5 h-5 fill-current"></i>
+          <span>START 2-MIN BLITZ NOW</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= VIEW 3: ACTIVE QUIZ ARENA ================= -->
+    <div id="view-quiz" class="app-view hidden">
+      
+      <!-- PROMINENT TOP REVERSE COUNTDOWN HUD -->
+      <div class="glass-panel p-4 sm:p-5 rounded-2xl mb-5 border border-cyan-500/30 relative overflow-hidden shadow-2xl">
+        <!-- Top Linear Reverse Countdown Progress Fill -->
+        <div class="w-full bg-slate-900/90 rounded-full h-2.5 mb-3.5 overflow-hidden p-0.5 border border-slate-800">
+          <div id="top-linear-progress-bar" class="top-linear-progress w-full h-full rounded-full"></div>
+        </div>
+
+        <div class="flex items-center justify-between gap-3">
+          
+          <!-- Live Score & Counter -->
+          <div class="flex items-center space-x-2.5 sm:space-x-4">
+            <div class="px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800">
+              <span class="block text-[9px] uppercase font-bold text-slate-400 tracking-wider">Score</span>
+              <span id="live-score" class="font-tech font-extrabold text-base sm:text-xl text-cyan-400">0</span>
+            </div>
+
+            <div class="px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800">
+              <span class="block text-[9px] uppercase font-bold text-slate-400 tracking-wider">Answered</span>
+              <div class="flex items-center space-x-1 font-tech font-bold text-sm sm:text-base text-emerald-400">
+                <span id="live-correct">0</span>
+                <span class="text-slate-500 text-xs">/</span>
+                <span id="live-total" class="text-slate-400 text-xs">0</span>
+              </div>
+            </div>
+
+            <!-- Streak Combo Indicator -->
+            <div id="streak-indicator" class="hidden sm:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold streak-fire opacity-0 transition-all">
+              <i data-lucide="flame" class="w-3.5 h-3.5 text-amber-400"></i>
+              <span id="streak-count">2x Combo</span>
+            </div>
+          </div>
+
+          <!-- PROMINENT REVERSE COUNTDOWN TIMER DISPLAY -->
+          <div class="flex items-center space-x-3 bg-slate-950/90 px-4 py-2 rounded-2xl border border-cyan-500/40 shadow-inner">
+            <div class="text-right">
+              <span class="block text-[9px] uppercase font-extrabold text-cyan-400 tracking-wider">Reverse Timer</span>
+              <div id="timer-display-main" class="countdown-digits font-tech font-black text-2xl sm:text-3xl text-cyan-300 leading-none">
+                02:00
+              </div>
+            </div>
+
+            <!-- Circular Mini Radial Indicator -->
+            <div class="relative w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center flex-shrink-0">
+              <svg class="w-full h-full" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" stroke-width="9" class="timer-circle-bg fill-transparent" />
+                <circle id="timer-progress-circle" cx="50" cy="50" r="40" stroke-width="9" stroke="#06b6d4" class="timer-circle-progress fill-transparent stroke-round" />
+              </svg>
+              <i data-lucide="timer" class="w-4 h-4 text-cyan-400 absolute"></i>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Question Box -->
+      <div class="glass-panel p-6 sm:p-8 rounded-3xl relative">
+        
+        <!-- Header Tags & Exit Button -->
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center space-x-2">
+            <span id="q-counter" class="px-2.5 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-bold font-mono">Q# 1</span>
+            <span id="q-category" class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 text-xs font-medium">Biomedical Signals</span>
+            <span id="q-difficulty" class="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">Medium</span>
+          </div>
+          
+          <button id="btn-leave-quiz-top" class="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 hover:text-rose-200 text-xs font-semibold flex items-center space-x-1 transition-colors" title="Exit / Leave Quiz">
+            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+            <span>Exit</span>
+          </button>
+        </div>
+
+        <!-- Question Title -->
+        <h2 id="q-text" class="text-lg sm:text-xl md:text-2xl font-bold text-white leading-snug mb-6 min-h-[56px] flex items-center">
+          Loading question...
+        </h2>
+
+        <!-- Options Container -->
+        <div id="q-options-container" class="grid grid-cols-1 gap-3 sm:gap-3.5 mb-6">
+          <!-- Dynamic Buttons injected here -->
+        </div>
+
+        <!-- Skip & Leave Footer Controls -->
+        <div class="flex items-center justify-between pt-4 border-t border-slate-800/80">
+          <button id="btn-leave-quiz-bottom" class="px-3.5 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 hover:text-rose-200 text-xs font-semibold flex items-center space-x-1.5 transition-colors">
+            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+            <span>Exit / Leave Quiz</span>
+          </button>
+
+          <button id="btn-skip-q" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 text-xs font-semibold flex items-center space-x-1.5 transition-colors">
+            <span>Skip Question</span>
+            <i data-lucide="skip-forward" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= VIEW 4: RESULTS BREAKDOWN ================= -->
+    <div id="view-results" class="app-view hidden">
+      <div class="max-w-xl mx-auto glass-panel p-6 sm:p-8 rounded-3xl text-center relative overflow-hidden">
+        
+        <div class="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-300 flex items-center justify-center mx-auto mb-4 shadow-xl shadow-amber-500/20">
+          <i data-lucide="award" class="w-8 h-8"></i>
+        </div>
+
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-1">Blitz Complete!</h2>
+        <p class="text-xs sm:text-sm text-slate-400 mb-6">
+          Great effort, <span id="res-name" class="text-cyan-300 font-semibold"></span> (<span id="res-id" class="font-mono text-slate-300"></span>)!
+        </p>
+
+        <!-- Main Score Highlight Card -->
+        <div class="p-6 rounded-2xl bg-gradient-to-b from-cyan-950/80 to-slate-900/90 border border-cyan-500/30 mb-6">
+          <span class="text-xs uppercase font-bold text-cyan-400 tracking-wider">Final Score</span>
+          <div id="res-score" class="font-tech font-black text-5xl sm:text-6xl text-white my-1">
+            0
+          </div>
+          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-xs text-slate-300">
+            <span>Current Rank:</span>
+            <strong id="res-rank" class="text-amber-400 font-tech font-bold text-sm">#1</strong>
+            <span id="res-total-players" class="text-slate-500 text-[11px]">out of 1</span>
+          </div>
+        </div>
+
+        <!-- Detailed Metrics Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-6 text-left">
+          <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+            <span class="block text-[10px] uppercase font-bold text-slate-400">Accuracy</span>
+            <span id="res-accuracy" class="font-tech font-bold text-base text-cyan-300">0%</span>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+            <span class="block text-[10px] uppercase font-bold text-emerald-400">Correct</span>
+            <span id="res-correct" class="font-tech font-bold text-base text-emerald-400">0</span>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+            <span class="block text-[10px] uppercase font-bold text-rose-400">Incorrect</span>
+            <span id="res-incorrect" class="font-tech font-bold text-base text-rose-400">0</span>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+            <span class="block text-[10px] uppercase font-bold text-slate-400">Total Answered</span>
+            <span id="res-answered" class="font-tech font-bold text-base text-cyan-300">0</span>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+            <span class="block text-[10px] uppercase font-bold text-amber-400">Max Streak</span>
+            <span id="res-streak" class="font-tech font-bold text-base text-amber-400">0 🔥</span>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+            <span class="block text-[10px] uppercase font-bold text-slate-400">Time Taken</span>
+            <span id="res-time" class="font-tech font-bold text-base text-teal-300">0s</span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="space-y-2.5">
+          <button id="btn-view-ranks-result" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-bold text-sm sm:text-base flex items-center justify-center space-x-2 shadow-lg shadow-amber-500/25 transition-all">
+            <i data-lucide="trophy" class="w-5 h-5"></i>
+            <span>View Full Leaderboard Podium</span>
+          </button>
+
+          <button id="btn-play-again" class="w-full py-3 px-6 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white font-semibold text-xs sm:text-sm transition-colors">
+            Back to Home
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================= VIEW 5: LIVE LEADERBOARD ================= -->
+    <div id="view-leaderboard" class="app-view hidden">
+      
+      <!-- Leaderboard Header -->
+      <div class="text-center max-w-2xl mx-auto mb-6">
+        <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold mb-3">
+          <i data-lucide="award" class="w-3.5 h-3.5"></i>
+          <span>Live Competition Standings</span>
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Hall of Champions & Rankings</h2>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">Real-time standings for all participants in CUET BMES Quiz</p>
+        
+        <!-- Live Participants Counter & Status -->
+        <div class="mt-3 flex flex-wrap items-center justify-center gap-2">
+          <span id="leaderboard-total-badge" class="px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-semibold font-tech">
+            👥 Total Contestants: 0
+          </span>
+          <span class="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold flex items-center space-x-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Live Auto-Sync</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Top 3 Podium Section -->
+      <div id="podium-container" class="mb-8">
+        <div class="text-center mb-3">
+          <span class="text-xs uppercase font-bold tracking-widest text-amber-400">🏆 Top 3 Podium Spotlight</span>
+        </div>
+        <div id="leaderboard-podium" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+          
+          <!-- 2nd Place (Silver) -->
+          <div id="podium-second" class="podium-2 p-5 rounded-3xl text-center order-2 md:order-1 transition-all">
+            <div class="w-12 h-12 rounded-2xl bg-slate-700/80 border border-slate-400/50 text-slate-200 font-extrabold text-xl flex items-center justify-center mx-auto mb-2 shadow-md">
+              🥈 2
+            </div>
+            <span class="text-xs uppercase font-bold text-slate-400 tracking-wider">2nd Place</span>
+            <h3 class="podium-name font-bold text-lg text-white mt-1 truncate">Waiting...</h3>
+            <p class="podium-id text-xs font-mono text-slate-400">--</p>
+            <div class="podium-score mt-3 font-tech font-black text-2xl text-slate-200">0 pts</div>
+          </div>
+
+          <!-- 1st Place (Gold) -->
+          <div id="podium-first" class="podium-1 p-6 sm:p-7 rounded-3xl text-center order-1 md:order-2 transform md:-translate-y-2 transition-all">
+            <div class="w-16 h-16 rounded-2xl bg-yellow-500/20 border-2 border-yellow-400 text-yellow-300 font-extrabold text-2xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-yellow-500/30 animate-bounce">
+              🥇 1
+            </div>
+            <span class="text-xs uppercase font-bold text-yellow-400 tracking-wider">Champion</span>
+            <h3 class="podium-name font-extrabold text-xl sm:text-2xl text-white mt-1 truncate">Waiting...</h3>
+            <p class="podium-id text-xs font-mono text-yellow-300/70">--</p>
+            <div class="podium-score mt-3 font-tech font-black text-3xl sm:text-4xl text-yellow-400">0 pts</div>
+          </div>
+
+          <!-- 3rd Place (Bronze) -->
+          <div id="podium-third" class="podium-3 p-5 rounded-3xl text-center order-3 md:order-3 transition-all">
+            <div class="w-12 h-12 rounded-2xl bg-amber-800/60 border border-amber-600/50 text-amber-300 font-extrabold text-xl flex items-center justify-center mx-auto mb-2 shadow-md">
+              🥉 3
+            </div>
+            <span class="text-xs uppercase font-bold text-amber-500 tracking-wider">3rd Place</span>
+            <h3 class="podium-name font-bold text-lg text-white mt-1 truncate">Waiting...</h3>
+            <p class="podium-id text-xs font-mono text-slate-400">--</p>
+            <div class="podium-score mt-3 font-tech font-black text-2xl text-amber-400">0 pts</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Complete Full Leaderboard Card (All Contestants View) -->
+      <div class="glass-panel rounded-3xl p-4 sm:p-6 shadow-2xl border border-slate-800">
+        
+        <!-- Search, Filter & Controls Header -->
+        <div class="flex flex-col md:flex-row items-center justify-between gap-3 mb-5 pb-4 border-b border-slate-800">
+          <div>
+            <h3 class="font-bold text-base text-white flex items-center space-x-2">
+              <i data-lucide="list-ordered" class="w-5 h-5 text-cyan-400"></i>
+              <span>All Contestants Standings (সকল অংশগ্রহণকারী)</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Showing all participants ranked from 1st to last</p>
+          </div>
+
+          <!-- Search & Sorting Controls -->
+          <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-start md:justify-end">
+            <!-- Search -->
+            <div class="relative flex-grow sm:flex-grow-0 sm:w-60">
+              <input type="text" id="search-leaderboard" placeholder="Search name, roll/ID..."
+                class="glass-input w-full px-3.5 py-2 pl-9 rounded-xl text-xs sm:text-sm">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+            </div>
+
+            <!-- Sort By Selector -->
+            <select id="sort-leaderboard" class="glass-input px-3 py-2 rounded-xl text-xs text-slate-300">
+              <option value="rank">🏅 Sort by Rank/Score</option>
+              <option value="accuracy">🎯 Sort by Accuracy</option>
+              <option value="time">⚡ Sort by Fastest Time</option>
+            </select>
+
+            <!-- Refresh Button -->
+            <button id="btn-refresh-leaderboard" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold flex items-center space-x-1.5 transition-colors">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">Refresh</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sync Loader -->
+        <div id="leaderboard-loader" class="hidden text-center py-2 text-xs text-cyan-400 flex items-center justify-center space-x-1.5">
+          <span class="animate-spin inline-block">↻</span>
+          <span>Updating rankings in real-time...</span>
+        </div>
+
+        <!-- Desktop/Tablet Full Table View -->
+        <div class="hidden sm:block overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 text-[11px] uppercase font-bold text-slate-400 tracking-wider bg-slate-900/60">
+                <th class="py-3 px-4 text-center">Rank</th>
+                <th class="py-3 px-4">Participant Details</th>
+                <th class="py-3 px-4 hidden md:table-cell">Dept & Batch</th>
+                <th class="py-3 px-4 text-center">Score</th>
+                <th class="py-3 px-4 text-center">Correct / Total</th>
+                <th class="py-3 px-4 text-center hidden lg:table-cell">Accuracy</th>
+                <th class="py-3 px-4 text-center hidden lg:table-cell">Time Used</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-tbody" class="divide-y divide-slate-800/40">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Card List View (Optimized for Phone Screens) -->
+        <div id="leaderboard-mobile-list" class="sm:hidden space-y-3">
+          <!-- Dynamically populated mobile cards -->
+        </div>
+
+    </div>
+
+  </main>
+
+  <!-- ================= QR CODE MODAL ================= -->
+  <div id="modal-qr" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md hidden">
+    <div class="glass-panel max-w-md w-full p-6 sm:p-7 rounded-3xl border border-cyan-500/40 text-center relative shadow-2xl">
+      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="qr-code" class="w-5 h-5 text-cyan-400"></i>
+          <h3 class="font-bold text-base sm:text-lg text-white">Scan to Join Quiz</h3>
+        </div>
+        <button id="btn-close-qr" class="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- QR Code Image Box -->
+      <div class="p-4 bg-white rounded-2xl inline-block mb-4 shadow-xl border-4 border-cyan-500/30">
+        <img src="/assets/qr_player_quiz_standard.png" alt="Scan to Play CUET BMES Quiz" class="w-52 h-52 sm:w-60 sm:h-60 mx-auto object-contain">
+      </div>
+
+      <p class="text-xs text-slate-300 font-medium mb-2">Scan with any smartphone camera to start instantly!</p>
+      <div class="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-cyan-300 text-xs font-mono break-all select-all">
+        https://indoor-ingredients-task-aruba.trycloudflare.com
+      </div>
+
+      <div class="mt-5 pt-3 border-t border-slate-800 flex items-center justify-between">
+        <a href="/assets/qr_player_quiz_standard.png" download="CUET_BMES_Quiz_Player_QR.png" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold flex items-center space-x-1.5 transition-colors">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span>Save PNG</span>
+        </a>
+        <button onclick="document.getElementById('modal-qr').classList.add('hidden')" class="px-5 py-2 rounded-xl bg-cyan-500 text-slate-950 font-bold text-xs hover:bg-cyan-400">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= RULES MODAL ================= -->
+  <div id="modal-rules" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden">
+    <div class="glass-panel max-w-lg w-full p-6 sm:p-7 rounded-3xl border border-slate-700 relative">
+      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="book-open" class="w-5 h-5 text-cyan-400"></i>
+          <h3 class="font-bold text-lg text-white">Competition Rules</h3>
+        </div>
+        <button id="btn-close-rules" class="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs sm:text-sm text-slate-300 leading-relaxed">
+        <p>1. <strong>2-Minute Blitz:</strong> Each participant is allotted exactly 2 minutes (120 seconds). The countdown begins as soon as the quiz is launched.</p>
+        <p>2. <strong>Speed & Accuracy:</strong> Answer as many questions as you can. Points are awarded instantly per question.</p>
+        <p>3. <strong>Tie-Breaker Hierarchy:</strong> In case of identical scores, rankings are determined by: (1) Higher Accuracy %, (2) Lower Time Used, (3) Earlier Submission.</p>
+        <p>4. <strong>Fair Play:</strong> Leaving the tab or refreshing will not pause the 120-second timer.</p>
+      </div>
+
+      <div class="mt-6 pt-4 border-t border-slate-800 text-right">
+        <button onclick="document.getElementById('modal-rules').classList.add('hidden')" class="px-5 py-2 rounded-xl bg-cyan-500 text-slate-950 font-bold text-xs hover:bg-cyan-400 transition-colors">
+          Understood
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= EXIT / LEAVE CONFIRMATION MODAL ================= -->
+  <div id="modal-confirm-exit" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm hidden">
+    <div class="glass-panel max-w-md w-full p-6 sm:p-7 rounded-3xl border border-rose-500/30 text-center relative shadow-2xl">
+      <div class="w-14 h-14 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-rose-500/20">
+        <i data-lucide="log-out" class="w-7 h-7"></i>
+      </div>
+      
+      <h3 class="font-bold text-lg text-white mb-2">Leave Quiz Competition?</h3>
+      <p class="text-xs sm:text-sm text-slate-300 mb-6 leading-relaxed">
+        Are you sure you want to leave? You can choose to submit your current score to the leaderboard or exit back to the home screen.
+      </p>
+
+      <div class="space-y-2.5">
+        <!-- Submit & Finish -->
+        <button id="btn-exit-submit" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center space-x-2 transition-all shadow-md">
+          <i data-lucide="check-circle" class="w-4 h-4"></i>
+          <span>Submit Current Score & View Ranks</span>
+        </button>
+
+        <!-- Quit without saving -->
+        <button id="btn-exit-discard" class="w-full py-3 px-4 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 hover:text-rose-200 text-xs sm:text-sm font-semibold flex items-center justify-center space-x-2 transition-colors">
+          <i data-lucide="x-circle" class="w-4 h-4"></i>
+          <span>Exit to Home (Quit)</span>
+        </button>
+
+        <!-- Cancel / Resume -->
+        <button id="btn-exit-cancel" class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-colors">
+          Resume Quiz
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="w-full border-t border-slate-800/60 py-4 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p>&copy; 2026 CUET Biomedical Engineering Society (BMES). All rights reserved.</p>
+      <p class="text-slate-600">Built for CUET BMES Speed Quiz Challenge</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/js/sfx.js"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    if (window.lucide) lucide.createIcons();
+  </script>
+</body>
+</html>
