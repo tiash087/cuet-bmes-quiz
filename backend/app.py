@@ -425,22 +425,27 @@ def get_leaderboard():
 
     leaderboard = []
     for idx, r in enumerate(rows):
-        total_ans = r["total_answered"]
-        correct_count = r["correct_count"]
+        total_ans = int(r.get("total_answered") or 0)
+        correct_count = int(r.get("correct_count") or 0)
         accuracy = round((correct_count / total_ans * 100.0), 1) if total_ans > 0 else 0.0
+        
+        comp_at = r.get("completed_at")
+        comp_at_str = str(comp_at) if comp_at is not None else None
+        time_val = float(r.get("time_used_seconds") or 0.0)
+
         leaderboard.append(LeaderboardEntry(
-            session_id=r["id"],
+            session_id=str(r.get("id")),
             rank=idx + 1,
-            name=r["name"],
-            student_id=r["student_id"],
-            department=r["department"] or "BME",
-            batch=r["batch"] or "N/A",
-            score=r["score"],
+            name=str(r.get("name")),
+            student_id=str(r.get("student_id")),
+            department=str(r.get("department") or "BME"),
+            batch=str(r.get("batch") or "N/A"),
+            score=int(r.get("score") or 0),
             correct_count=correct_count,
             total_answered=total_ans,
-            accuracy_percentage=accuracy,
-            time_used_seconds=round(r["time_used_seconds"], 1),
-            completed_at=r["completed_at"]
+            accuracy_percentage=float(accuracy),
+            time_used_seconds=round(time_val, 1),
+            completed_at=comp_at_str
         ))
 
     return leaderboard
