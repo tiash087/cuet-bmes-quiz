@@ -190,6 +190,12 @@
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
+            <!-- Add / Restore Participant Button -->
+            <button id="btn-open-manual-entry" class="px-3.5 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-xs font-bold flex items-center space-x-1.5 transition-colors" title="Manually restore or add participant score">
+              <i data-lucide="user-plus" class="w-4 h-4"></i>
+              <span>Add / Restore Score</span>
+            </button>
+
             <!-- Export CSV -->
             <button id="btn-export-csv" class="px-3.5 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center space-x-1.5 transition-colors">
               <i data-lucide="download" class="w-4 h-4"></i>
@@ -447,6 +453,75 @@
           Close
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- Manual Entry / Restore Modal -->
+  <div id="modal-manual-entry" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-lg p-6 sm:p-8 rounded-3xl border border-cyan-500/40 shadow-2xl relative">
+      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+        <div>
+          <h3 class="font-bold text-lg text-white flex items-center space-x-2">
+            <i data-lucide="user-plus" class="w-5 h-5 text-cyan-400"></i>
+            <span>Add / Restore Participant Score</span>
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Manually insert or restore a participant's score on the live leaderboard</p>
+        </div>
+        <button id="btn-close-manual-entry" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-manual-entry" class="space-y-3.5 text-xs">
+        <div>
+          <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1">Participant Name *</label>
+          <input type="text" id="manual-name" required placeholder="e.g. Rifat Hossain" class="glass-input w-full px-3.5 py-2 rounded-xl text-sm">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1">Student ID *</label>
+            <input type="text" id="manual-student-id" required placeholder="e.g. 2211024" class="glass-input w-full px-3.5 py-2 rounded-xl text-sm">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1">Department</label>
+            <input type="text" id="manual-dept" value="BME" class="glass-input w-full px-3.5 py-2 rounded-xl text-sm">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1">Batch</label>
+            <input type="text" id="manual-batch" placeholder="e.g. 22" class="glass-input w-full px-3.5 py-2 rounded-xl text-sm">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
+          <div>
+            <label class="block text-[10px] font-bold text-cyan-400 uppercase tracking-wider mb-1">Score (Pts) *</label>
+            <input type="number" id="manual-score" required placeholder="e.g. 26" class="glass-input w-full px-3 py-2 rounded-xl font-tech text-sm font-bold text-cyan-300">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-1">Correct Qs</label>
+            <input type="number" id="manual-correct" value="0" min="0" class="glass-input w-full px-3 py-2 rounded-xl font-tech text-sm">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Answered</label>
+            <input type="number" id="manual-total" value="0" min="0" class="glass-input w-full px-3 py-2 rounded-xl font-tech text-sm">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-amber-400 uppercase tracking-wider mb-1">Time (Seconds)</label>
+            <input type="number" step="0.1" id="manual-time" value="120.0" class="glass-input w-full px-3 py-2 rounded-xl font-tech text-sm">
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-800 flex items-center justify-end space-x-2">
+          <button type="button" id="btn-cancel-manual-entry" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-cyan-500 text-slate-950 text-xs font-bold hover:bg-cyan-400 shadow-lg shadow-cyan-500/25 flex items-center space-x-1.5">
+            <i data-lucide="check" class="w-4 h-4"></i>
+            <span>Add to Leaderboard</span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 

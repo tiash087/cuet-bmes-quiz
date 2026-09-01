@@ -100,10 +100,21 @@ class AdminLogin(BaseModel):
     password: str
 
 class AdminSettingsUpdate(BaseModel):
-    quiz_duration: Optional[int] = 120
-    positive_points: Optional[int] = 4
-    negative_points: Optional[int] = 1
-    allow_negative: Optional[bool] = True
-    competition_title: Optional[str] = "CUET BMES 2-Minute Blitz Quiz"
+    quiz_duration: Optional[int] = None
+    positive_points: Optional[int] = None
+    negative_points: Optional[int] = None
+    allow_negative: Optional[bool] = None
+    competition_title: Optional[str] = None
+    allow_retakes: Optional[bool] = None
     admin_password: Optional[str] = None
-    allow_retakes: Optional[bool] = False
+
+class ManualParticipantEntry(BaseModel):
+    name: str
+    student_id: str
+    department: Optional[str] = "BME"
+    batch: Optional[str] = ""
+    score: int
+    correct_count: Optional[int] = 0
+    incorrect_count: Optional[int] = 0
+    total_answered: Optional[int] = 0
+    time_used_seconds: Optional[float] = 120.0

@@ -8,13 +8,22 @@ from backend.sample_questions import SAMPLE_QUESTIONS
 DB_PATH = Path(__file__).parent.parent / "quiz.db"
 
 def get_db_connection():
-    conn = sqlite3.connect(DB_PATH, timeout=10.0, check_same_thread=False)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL;")
-    conn.execute("PRAGMA synchronous=NORMAL;")
-    conn.execute("PRAGMA cache_size=10000;")
-    conn.execute("PRAGMA busy_timeout=5000;")
-    return conn
+    db_url = os.environ.get("DATABASE_URL")
+    if db_url and ("postgres://" in db_url or "postgresql://" in db_url):
+        import psycopg2
+        from psycopg2.extras import RealDictCursor
+        if db_url.startswith("postgres://"):
+            db_url = db_url.replace("postgres://", "postgresql://", 1)
+        conn = psycopg2.connect(db_url, sslmode="require")
+        return conn
+    else:
+        conn = sqlite3.connect(DB_PATH, timeout=15.0, check_same_thread=False)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA synchronous=NORMAL;")
+        conn.execute("PRAGMA cache_size=10000;")
+        conn.execute("PRAGMA busy_timeout=5000;")
+        return conn
 
 def init_db(force_reseed: bool = False):
     conn = get_db_connection()

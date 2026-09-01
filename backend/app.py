@@ -30,7 +30,8 @@ from backend.models import (
     LeaderboardEntry,
     QuestionAdmin,
     AdminLogin,
-    AdminSettingsUpdate
+    AdminSettingsUpdate,
+    ManualParticipantEntry
 )
 
 from fastapi.middleware.gzip import GZipMiddleware
@@ -696,6 +697,38 @@ def delete_single_session(session_id: str, auth: bool = Depends(verify_admin_tok
         "success": True,
         "message": f"Session #{session_id[:8]} removed from leaderboard (Archived for undo)."
     }
+
+@app.post("/api/admin/manual-entry")
+def manual_entry_participant(data: ManualParticipantEntry, auth: bool = Depends(verify_admin_token)):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id FROM participants WHERE student_id = ?", (data.student_id.strip(),))
+    existing = cursor.fetchone()
+    if existing:
+        p_id = existing["id"]
+        cursor.execute("UPDATE participants SET name = ?, department = ?, batch = ? WHERE id = ?", 
+                       (data.name.strip(), data.department or "BME", data.batch or "", p_id))
+    else:
+        cursor.execute("""
+        INSERT INTO participants (name, student_id, department, batch)
+        VALUES (?, ?, ?, ?)
+        """, (data.name.strip(), data.student_id.strip(), data.department or "BME", data.batch or ""))
+        p_id = getattr(cursor, 'lastrowid', None)
+        if not p_id:
+            cursor.execute("SELECT id FROM participants WHERE student_id = ?", (data.student_id.strip(),))
+            p_id = cursor.fetchone()["id"]
+
+    session_id = str(uuid.uuid4())
+    cursor.execute("""
+    INSERT INTO quiz_sessions (id, participant_id, score, total_answered, correct_count, incorrect_count, time_used_seconds, is_completed, completed_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP)
+    """, (session_id, p_id, data.score, data.total_answered or data.correct_count, data.correct_count, data.incorrect_count, data.time_used_seconds or 120.0))
+
+    conn.commit()
+    conn.close()
+    return {"success": True, "message": f"Participant {data.name} ({data.student_id}) successfully restored/added with {data.score} pts!"}
+
 
 @app.get("/api/admin/export-csv")
 def export_csv(auth: bool = Depends(verify_admin_token)):

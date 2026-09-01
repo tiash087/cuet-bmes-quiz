@@ -107,6 +107,24 @@ class AdminApp {
     document.getElementById('btn-export-csv')?.addEventListener('click', () => {
       this.exportCsv();
     });
+
+    // Manual Entry / Restore Modal
+    document.getElementById('btn-open-manual-entry')?.addEventListener('click', () => {
+      document.getElementById('modal-manual-entry')?.classList.remove('hidden');
+    });
+
+    document.getElementById('btn-close-manual-entry')?.addEventListener('click', () => {
+      document.getElementById('modal-manual-entry')?.classList.add('hidden');
+    });
+
+    document.getElementById('btn-cancel-manual-entry')?.addEventListener('click', () => {
+      document.getElementById('modal-manual-entry')?.classList.add('hidden');
+    });
+
+    document.getElementById('form-manual-entry')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.handleManualEntry();
+    });
   }
 
   async handleLogin() {
@@ -614,6 +632,53 @@ class AdminApp {
 
   exportCsv() {
     window.open(`${API_BASE}/api/admin/export-csv?x_admin_token=${encodeURIComponent(this.token)}`, '_blank');
+  }
+
+  async handleManualEntry() {
+    const name = document.getElementById('manual-name')?.value?.trim();
+    const student_id = document.getElementById('manual-student-id')?.value?.trim();
+    const department = document.getElementById('manual-dept')?.value?.trim() || 'BME';
+    const batch = document.getElementById('manual-batch')?.value?.trim();
+    const score = parseInt(document.getElementById('manual-score')?.value, 10);
+    const correct_count = parseInt(document.getElementById('manual-correct')?.value, 10) || 0;
+    const total_answered = parseInt(document.getElementById('manual-total')?.value, 10) || correct_count;
+    const time_used_seconds = parseFloat(document.getElementById('manual-time')?.value) || 120.0;
+
+    if (!name || !student_id || isNaN(score)) {
+      alert('Please enter Name, Student ID, and Score.');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/manual-entry`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-token': this.token
+        },
+        body: JSON.stringify({
+          name,
+          student_id,
+          department,
+          batch,
+          score,
+          correct_count,
+          incorrect_count: Math.max(0, total_answered - correct_count),
+          total_answered,
+          time_used_seconds
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Failed to add/restore participant');
+
+      document.getElementById('modal-manual-entry')?.classList.add('hidden');
+      document.getElementById('form-manual-entry')?.reset();
+      this.loadResults();
+      this.showToast(`✅ ${name} (${student_id}) restored with ${score} pts!`);
+    } catch (e) {
+      alert('Error: ' + e.message);
+    }
   }
 
   escapeHtml(str) {
