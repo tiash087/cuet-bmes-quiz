@@ -715,16 +715,21 @@ def delete_single_session(session_id: str, auth: bool = Depends(verify_admin_tok
         s["started_at"], s["completed_at"], s["answers_log"], batch_id
     ))
     
+    p_id = s.get("participant_id") if isinstance(s, dict) else s[1]
     cursor.execute("DELETE FROM quiz_sessions WHERE id = ?", (session_id,))
+    cursor.execute("DELETE FROM quiz_sessions_archive WHERE id = ?", (session_id,))
+    if p_id:
+        cursor.execute("DELETE FROM participants WHERE id = ?", (p_id,))
+        
     conn.commit()
     conn.close()
     
     return {
         "success": True,
-        "message": f"Session #{session_id[:8]} removed from leaderboard (Archived for undo)."
+        "message": f"Participant and session #{session_id[:8]} permanently deleted from database."
     }
 
-@app.delete("/api/admin/purge-all-data")
+@app.api_route("/api/admin/purge-all-data", methods=["DELETE", "POST"])
 def purge_all_data(auth: bool = Depends(verify_admin_token)):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -734,6 +739,7 @@ def purge_all_data(auth: bool = Depends(verify_admin_token)):
     conn.commit()
     conn.close()
     return {"success": True, "message": "All leaderboard records and participants have been permanently purged. Ready for fresh tournament!"}
+
 
 
 @app.post("/api/admin/manual-entry")

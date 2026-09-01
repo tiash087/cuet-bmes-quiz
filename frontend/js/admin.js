@@ -590,40 +590,35 @@ class AdminApp {
   }
 
   async deleteSession(sessionId) {
-    if (!confirm(`Delete this participant submission record? (Record will be archived and can be restored via Undo)`)) {
+    if (!confirm("Are you sure you want to delete this participant submission?")) {
       return;
     }
 
     try {
+      const token = this.token || sessionStorage.getItem('admin_token') || 'BME_2122';
       const res = await fetch(`${API_BASE}/api/admin/sessions/${sessionId}`, {
         method: 'DELETE',
-        headers: { 'X-Admin-Token': this.token }
+        headers: { 'X-Admin-Token': token }
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Delete failed");
 
       this.loadResults();
-      this.showToast(`🗑️ Participant submission deleted (Archived).`, true);
+      this.showToast("🗑️ Participant submission permanently deleted.", false);
     } catch (e) {
       alert("Delete session error: " + e.message);
     }
   }
 
   async purgeAllData() {
-    if (!confirm("⚠️ PERMANENT PURGE WARNING:\n\nAre you sure you want to permanently delete ALL leaderboard records, participant registrations, and archives?\n\nThis will completely reset the leaderboard to 0 for a fresh live tournament!")) {
-      return;
-    }
-    
-    const verifyWord = prompt("Type 'DELETE' in capital letters to confirm permanent wipe:");
-    if (verifyWord !== "DELETE") {
-      alert("Purge cancelled. No records were deleted.");
+    if (!confirm("⚠️ PERMANENT PURGE:\n\nAre you sure you want to permanently delete ALL participant records, registrations, and leaderboard scores from the database?\n\nThis will completely reset the tournament leaderboard to 0.")) {
       return;
     }
 
     try {
       const token = this.token || sessionStorage.getItem('admin_token') || 'BME_2122';
       const res = await fetch(`${API_BASE}/api/admin/purge-all-data`, {
-        method: 'DELETE',
+        method: 'POST',
         headers: { 'X-Admin-Token': token }
       });
       const data = await res.json();
