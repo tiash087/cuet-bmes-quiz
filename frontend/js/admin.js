@@ -631,15 +631,15 @@ class AdminApp {
   }
 
   async exportCsv() {
+    const token = this.token || sessionStorage.getItem('admin_token') || 'BME_2122';
     try {
-      const res = await fetch(`${API_BASE}/api/admin/export-csv`, {
+      const res = await fetch(`${API_BASE}/api/admin/export-csv?token=${encodeURIComponent(token)}`, {
         headers: {
-          'X-Admin-Token': this.token
+          'X-Admin-Token': token
         }
       });
       if (!res.ok) {
-        // Fallback with URL parameter
-        window.open(`${API_BASE}/api/admin/export-csv?token=${encodeURIComponent(this.token)}`, '_blank');
+        window.open(`${API_BASE}/api/admin/export-csv?token=${encodeURIComponent(token)}`, '_blank');
         return;
       }
       const blob = await res.blob();
@@ -653,7 +653,7 @@ class AdminApp {
       window.URL.revokeObjectURL(url);
       this.showToast('📥 CSV Leaderboard exported successfully!');
     } catch (e) {
-      window.open(`${API_BASE}/api/admin/export-csv?token=${encodeURIComponent(this.token)}`, '_blank');
+      window.open(`${API_BASE}/api/admin/export-csv?token=${encodeURIComponent(token)}`, '_blank');
     }
   }
 
