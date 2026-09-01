@@ -57,9 +57,13 @@ def on_startup():
     init_db()
 
 # Dependency for simple admin authentication
-def verify_admin_token(x_admin_token: Optional[str] = Header(None)):
+def verify_admin_token(
+    x_admin_token: Optional[str] = Header(None, alias="X-Admin-Token"),
+    token: Optional[str] = None
+):
     admin_pass = get_setting("admin_password", "admin")
-    if not x_admin_token or x_admin_token != admin_pass:
+    provided = x_admin_token or token
+    if not provided or provided != admin_pass:
         raise HTTPException(status_code=401, detail="Unauthorized Admin Access")
     return True
 

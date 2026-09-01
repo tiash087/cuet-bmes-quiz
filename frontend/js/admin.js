@@ -630,8 +630,31 @@ class AdminApp {
     toast.classList.remove('translate-y-0', 'opacity-100');
   }
 
-  exportCsv() {
-    window.open(`${API_BASE}/api/admin/export-csv?x_admin_token=${encodeURIComponent(this.token)}`, '_blank');
+  async exportCsv() {
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/export-csv`, {
+        headers: {
+          'X-Admin-Token': this.token
+        }
+      });
+      if (!res.ok) {
+        // Fallback with URL parameter
+        window.open(`${API_BASE}/api/admin/export-csv?token=${encodeURIComponent(this.token)}`, '_blank');
+        return;
+      }
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `CUET_BMES_Leaderboard_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      this.showToast('📥 CSV Leaderboard exported successfully!');
+    } catch (e) {
+      window.open(`${API_BASE}/api/admin/export-csv?token=${encodeURIComponent(this.token)}`, '_blank');
+    }
   }
 
   async handleManualEntry() {
