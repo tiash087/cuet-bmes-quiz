@@ -218,11 +218,11 @@ def init_db(force_reseed: bool = False):
     # Seed default settings if not present
     default_settings = {
         "admin_password": "BME_2122",
-        "quiz_duration": "150",
+        "quiz_duration": "120",
         "positive_points": "4",
         "negative_points": "1",
         "allow_negative": "true",
-        "competition_title": "CUET BMES 2.5-Minute Blitz Quiz",
+        "competition_title": "CUET BMES 2-Minute Blitz Quiz",
         "allow_retakes": "false"
     }
 
