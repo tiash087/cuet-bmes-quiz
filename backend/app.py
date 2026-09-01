@@ -361,7 +361,7 @@ def finish_quiz(data: FinishQuizRequest):
     SELECT s.id, s.score, s.total_answered, s.correct_count, s.time_used_seconds
     FROM quiz_sessions s
     WHERE s.is_completed = 1
-    ORDER BY s.score DESC, (CAST(s.correct_count AS FLOAT) / MAX(s.total_answered, 1)) DESC, s.time_used_seconds ASC, s.completed_at ASC
+    ORDER BY s.score DESC, (CAST(s.correct_count AS FLOAT) / (CASE WHEN s.total_answered > 0 THEN s.total_answered ELSE 1 END)) DESC, s.time_used_seconds ASC, s.completed_at ASC
     """)
     all_completed = cursor.fetchall()
     
@@ -406,7 +406,7 @@ def get_leaderboard():
     FROM quiz_sessions s
     JOIN participants p ON s.participant_id = p.id
     WHERE s.is_completed = 1 OR s.total_answered > 0
-    ORDER BY s.score DESC, (CAST(s.correct_count AS FLOAT) / MAX(s.total_answered, 1)) DESC, s.time_used_seconds ASC, s.completed_at ASC
+    ORDER BY s.score DESC, (CAST(s.correct_count AS FLOAT) / (CASE WHEN s.total_answered > 0 THEN s.total_answered ELSE 1 END)) DESC, s.time_used_seconds ASC, s.completed_at ASC
     """)
     rows = cursor.fetchall()
     conn.close()
