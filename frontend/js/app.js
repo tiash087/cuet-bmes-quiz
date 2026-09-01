@@ -31,6 +31,8 @@ class QuizApp {
       maxStreak: 0
     };
 
+    this.hasTriggered60Alarm = false;
+
     this.leaderboardData = [];
     this.leaderboardInterval = null;
 
@@ -151,6 +153,18 @@ class QuizApp {
     document.getElementById('btn-exit-cancel')?.addEventListener('click', () => {
       window.SFX.playClick();
       this.hideModal('modal-confirm-exit');
+    });
+
+    // 60+ Questions Milestone Alarm Actions
+    document.getElementById('btn-alarm-submit-now')?.addEventListener('click', () => {
+      document.getElementById('modal-60-alarm')?.classList.add('hidden');
+      window.SFX.playClick();
+      this.finishQuiz(false);
+    });
+
+    document.getElementById('btn-alarm-continue')?.addEventListener('click', () => {
+      document.getElementById('modal-60-alarm')?.classList.add('hidden');
+      window.SFX.playClick();
     });
 
     // Results Actions
@@ -345,7 +359,9 @@ class QuizApp {
       currentStreak: 0,
       maxStreak: 0
     };
+    this.hasTriggered60Alarm = false;
     this.isSubmitting = false;
+    document.getElementById('modal-60-alarm')?.classList.add('hidden');
 
     this.switchView('view-quiz');
     this.updateStatsUI();
@@ -546,6 +562,12 @@ class QuizApp {
     // Instant HUD stats refresh
     this.updateStatsUI();
 
+    // 60+ Questions Milestone & Submission Alarm Alert
+    if (this.stats.totalAnswered >= 60 && !this.hasTriggered60Alarm) {
+      this.hasTriggered60Alarm = true;
+      this.trigger60AlarmAlert();
+    }
+
     // 2. DISPATCH ASYNC SERVER SYNC (Non-blocking background HTTP call)
     fetch(`${API_BASE}/api/quiz/submit-answer`, {
       method: 'POST',
@@ -568,6 +590,19 @@ class QuizApp {
         this.finishQuiz();
       }
     }, 75);
+  }
+
+  trigger60AlarmAlert() {
+    if (window.SFX) {
+      window.SFX.playAlarm();
+    }
+    const modal = document.getElementById('modal-60-alarm');
+    const countEl = document.getElementById('alarm-q-count');
+    if (countEl) countEl.textContent = this.stats.totalAnswered;
+    if (modal) {
+      modal.classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
   }
 
   updateStatsUI() {

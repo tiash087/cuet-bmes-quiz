@@ -141,6 +141,40 @@ class SoundManager {
       delay += n.d + 50;
     });
   }
+
+  playAlarm() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.audioCtx) return;
+
+    // Siren alarm: 3 pulsating siren sweeps
+    const sweeps = [
+      { start: 700, end: 1100, delay: 0 },
+      { start: 700, end: 1100, delay: 200 },
+      { start: 700, end: 1200, delay: 400 }
+    ];
+
+    sweeps.forEach(({ start, end, delay }) => {
+      setTimeout(() => {
+        try {
+          if (!this.audioCtx) return;
+          const osc = this.audioCtx.createOscillator();
+          const gain = this.audioCtx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(start, this.audioCtx.currentTime);
+          osc.frequency.linearRampToValueAtTime(end, this.audioCtx.currentTime + 0.15);
+
+          gain.gain.setValueAtTime(0.25, this.audioCtx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, this.audioCtx.currentTime + 0.18);
+
+          osc.connect(gain);
+          gain.connect(this.audioCtx.destination);
+          osc.start();
+          osc.stop(this.audioCtx.currentTime + 0.18);
+        } catch (e) {}
+      }, delay);
+    });
+  }
 }
 
 window.SFX = new SoundManager();

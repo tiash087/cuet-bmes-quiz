@@ -625,6 +625,45 @@
     </div>
   </div>
 
+  <!-- ================= 60+ QUESTIONS ALARM & SUBMISSION ALERT MODAL ================= -->
+  <div id="modal-60-alarm" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-md p-6 sm:p-8 rounded-3xl border-2 border-amber-500 shadow-2xl shadow-amber-500/20 text-center relative overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- Top Pulsing Warning Badge -->
+      <div class="w-16 h-16 rounded-2xl bg-amber-500/20 border-2 border-amber-500/50 flex items-center justify-center mx-auto mb-4 animate-bounce shadow-lg shadow-amber-500/30">
+        <i data-lucide="bell-ring" class="w-8 h-8 text-amber-400"></i>
+      </div>
+
+      <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold uppercase tracking-wider border border-amber-500/30 inline-block mb-2">
+        ⚡ 60+ Questions Milestone Alert
+      </span>
+
+      <h3 class="text-xl sm:text-2xl font-extrabold text-white font-tech mb-2">
+        You Have Answered 60+ Questions!
+      </h3>
+      <p class="text-xs sm:text-sm text-slate-300 mb-1">
+        আপনি ইতোমধ্যে <span id="alarm-q-count" class="text-amber-400 font-bold font-mono text-base">60</span> টি প্রশ্নের উত্তর সম্পন্ন করেছেন।
+      </p>
+      <p class="text-xs text-slate-400 mb-6 leading-relaxed">
+        আপনার স্কোর নিশ্চিত করতে এখনই সাবমিট করতে পারেন অথবা বাকি সময় আরো প্রশ্নের উত্তর চালিয়ে যেতে পারেন।
+      </p>
+
+      <div class="space-y-3">
+        <!-- Submit Quiz Now Button -->
+        <button id="btn-alarm-submit-now" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-sm sm:text-base flex items-center justify-center space-x-2 shadow-lg shadow-emerald-500/25 hover:from-emerald-400 hover:to-teal-400 transition-all transform hover:scale-[1.02] active:scale-95">
+          <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+          <span>Submit Quiz Now (ফাইনাল সাবমিট)</span>
+        </button>
+
+        <!-- Continue Answering Button -->
+        <button id="btn-alarm-continue" class="w-full py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 text-xs font-semibold border border-slate-700 transition-colors flex items-center justify-center space-x-1.5">
+          <i data-lucide="play" class="w-4 h-4"></i>
+          <span>Continue Answering (উত্তর চালিয়ে যান)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= EXIT / LEAVE CONFIRMATION MODAL ================= -->
   <div id="modal-confirm-exit" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm hidden">
     <div class="glass-panel max-w-md w-full p-6 sm:p-7 rounded-3xl border border-rose-500/30 text-center relative shadow-2xl">
