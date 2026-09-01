@@ -5,17 +5,100 @@ import random
 from pathlib import Path
 from backend.sample_questions import SAMPLE_QUESTIONS
 
+import re
+
 DB_PATH = Path(__file__).parent.parent / "quiz.db"
+
+class PostgresCursorWrapper:
+    def __init__(self, cursor):
+        self._cursor = cursor
+
+    def execute(self, query, params=None):
+        q = query
+        # 1. Replace SQLite ? with Postgres %s
+        q = q.replace("?", "%s")
+        # 2. Translate table creation datatypes
+        q = q.replace("INTEGER PRIMARY KEY AUTOINCREMENT", "SERIAL PRIMARY KEY")
+        q = q.replace("DATETIME", "TIMESTAMP")
+        # 3. Translate INSERT OR IGNORE
+        if "INSERT OR IGNORE INTO settings" in q:
+            q = re.sub(
+                r"INSERT\s+OR\s+IGNORE\s+INTO\s+settings\s*\(([^)]+)\)\s*VALUES\s*\(([^)]+)\)",
+                r"INSERT INTO settings (\1) VALUES (\2) ON CONFLICT (key) DO NOTHING",
+                q, flags=re.IGNORECASE
+            )
+        elif "INSERT OR IGNORE INTO participants" in q:
+            q = re.sub(
+                r"INSERT\s+OR\s+IGNORE\s+INTO\s+participants\s*\(([^)]+)\)\s*VALUES\s*\(([^)]+)\)",
+                r"INSERT INTO participants (\1) VALUES (\2) ON CONFLICT (student_id) DO NOTHING",
+                q, flags=re.IGNORECASE
+            )
+        # 4. Translate INSERT OR REPLACE
+        if "INSERT OR REPLACE INTO settings" in q:
+            q = re.sub(
+                r"INSERT\s+OR\s+REPLACE\s+INTO\s+settings\s*\(([^)]+)\)\s*VALUES\s*\(([^)]+)\)",
+                r"INSERT INTO settings (\1) VALUES (\2) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value",
+                q, flags=re.IGNORECASE
+            )
+        elif "INSERT OR REPLACE INTO quiz_sessions" in q:
+            q = re.sub(
+                r"INSERT\s+OR\s+REPLACE\s+INTO\s+quiz_sessions\s*\(([^)]+)\)\s*VALUES\s*\(([^)]+)\)",
+                r"INSERT INTO quiz_sessions (\1) VALUES (\2) ON CONFLICT (id) DO UPDATE SET score = EXCLUDED.score, total_answered = EXCLUDED.total_answered, correct_count = EXCLUDED.correct_count, incorrect_count = EXCLUDED.incorrect_count, is_completed = EXCLUDED.is_completed, completed_at = EXCLUDED.completed_at",
+                q, flags=re.IGNORECASE
+            )
+
+        if params is not None:
+            return self._cursor.execute(q, params)
+        return self._cursor.execute(q)
+
+    def fetchone(self):
+        return self._cursor.fetchone()
+
+    def fetchall(self):
+        return self._cursor.fetchall()
+
+    @property
+    def lastrowid(self):
+        try:
+            return self._cursor.lastrowid
+        except:
+            return None
+
+    def close(self):
+        try:
+            self._cursor.close()
+        except:
+            pass
+
+class PostgresConnectionWrapper:
+    def __init__(self, raw_conn):
+        self._conn = raw_conn
+
+    def cursor(self):
+        from psycopg2.extras import RealDictCursor
+        raw_cursor = self._conn.cursor(cursor_factory=RealDictCursor)
+        return PostgresCursorWrapper(raw_cursor)
+
+    def commit(self):
+        self._conn.commit()
+
+    def rollback(self):
+        self._conn.rollback()
+
+    def close(self):
+        try:
+            self._conn.close()
+        except:
+            pass
 
 def get_db_connection():
     db_url = os.environ.get("DATABASE_URL")
     if db_url and ("postgres://" in db_url or "postgresql://" in db_url):
         import psycopg2
-        from psycopg2.extras import RealDictCursor
         if db_url.startswith("postgres://"):
             db_url = db_url.replace("postgres://", "postgresql://", 1)
-        conn = psycopg2.connect(db_url, sslmode="require")
-        return conn
+        raw_conn = psycopg2.connect(db_url, sslmode="require")
+        return PostgresConnectionWrapper(raw_conn)
     else:
         conn = sqlite3.connect(DB_PATH, timeout=15.0, check_same_thread=False)
         conn.row_factory = sqlite3.Row
@@ -24,6 +107,7 @@ def get_db_connection():
         conn.execute("PRAGMA cache_size=10000;")
         conn.execute("PRAGMA busy_timeout=5000;")
         return conn
+
 
 def init_db(force_reseed: bool = False):
     conn = get_db_connection()
