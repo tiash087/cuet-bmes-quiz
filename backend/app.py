@@ -347,7 +347,7 @@ def finish_quiz(data: FinishQuizRequest):
         conn.close()
         raise HTTPException(status_code=404, detail="Quiz session not found")
 
-    time_used = min(float(data.time_used_seconds or 60.0), float(row["time_limit_seconds"]))
+    time_used = min(float(data.time_used_seconds or 60.0), float(row.get("time_limit_seconds") or 120.0))
 
     cursor.execute("""
     UPDATE quiz_sessions 
@@ -355,6 +355,15 @@ def finish_quiz(data: FinishQuizRequest):
     WHERE id = ?
     """, (time_used, data.session_id))
     conn.commit()
+
+    # Re-fetch row with updated timestamp and values
+    cursor.execute("""
+    SELECT s.*, p.name, p.student_id 
+    FROM quiz_sessions s
+    JOIN participants p ON s.participant_id = p.id
+    WHERE s.id = ?
+    """, (data.session_id,))
+    row = cursor.fetchone()
 
     # Calculate Leaderboard Ranking
     cursor.execute("""
@@ -368,27 +377,30 @@ def finish_quiz(data: FinishQuizRequest):
     total_participants = len(all_completed)
     rank = 1
     for idx, s in enumerate(all_completed):
-        if s["id"] == data.session_id:
+        if str(s["id"]) == str(data.session_id):
             rank = idx + 1
             break
 
-    total_ans = row["total_answered"]
-    correct_count = row["correct_count"]
+    total_ans = int(row.get("total_answered") or 0)
+    correct_count = int(row.get("correct_count") or 0)
+    incorrect_count = int(row.get("incorrect_count") or 0)
+    max_streak = int(row.get("max_streak") or 0)
+    score = int(row.get("score") or 0)
     accuracy = round((correct_count / total_ans * 100.0), 1) if total_ans > 0 else 0.0
 
     conn.close()
 
     return FinishQuizResponse(
-        session_id=row["id"],
-        participant_name=row["name"],
-        student_id=row["student_id"],
-        score=row["score"],
+        session_id=str(row["id"]),
+        participant_name=str(row["name"]),
+        student_id=str(row["student_id"]),
+        score=score,
         total_answered=total_ans,
         correct_count=correct_count,
-        incorrect_count=row["incorrect_count"],
-        max_streak=row["max_streak"],
-        accuracy_percentage=accuracy,
-        time_used_seconds=time_used,
+        incorrect_count=incorrect_count,
+        max_streak=max_streak,
+        accuracy_percentage=float(accuracy),
+        time_used_seconds=float(time_used),
         current_rank=rank,
         total_participants=total_participants
     )
