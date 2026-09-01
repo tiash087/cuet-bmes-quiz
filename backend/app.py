@@ -389,14 +389,14 @@ def get_leaderboard():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Get all completed quiz sessions ordered by score DESC, accuracy DESC, time_used_seconds ASC
+    # Get all completed or active quiz sessions ordered by score DESC, accuracy DESC, time_used_seconds ASC
     cursor.execute("""
     SELECT 
         s.id, s.score, s.total_answered, s.correct_count, s.time_used_seconds, s.completed_at,
         p.name, p.student_id, p.department, p.batch
     FROM quiz_sessions s
     JOIN participants p ON s.participant_id = p.id
-    WHERE s.is_completed = 1
+    WHERE s.is_completed = 1 OR s.total_answered > 0
     ORDER BY s.score DESC, (CAST(s.correct_count AS FLOAT) / MAX(s.total_answered, 1)) DESC, s.time_used_seconds ASC, s.completed_at ASC
     """)
     rows = cursor.fetchall()
@@ -741,7 +741,7 @@ def export_csv(auth: bool = Depends(verify_admin_token)):
         s.max_streak, s.time_used_seconds, s.completed_at
     FROM quiz_sessions s
     JOIN participants p ON s.participant_id = p.id
-    WHERE s.is_completed = 1
+    WHERE s.is_completed = 1 OR s.total_answered > 0
     ORDER BY s.score DESC, s.correct_count DESC, s.time_used_seconds ASC
     """)
     rows = cursor.fetchall()
