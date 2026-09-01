@@ -168,6 +168,11 @@ class QuizApp {
     });
 
     // Results Actions
+    document.getElementById('btn-download-cert')?.addEventListener('click', () => {
+      window.SFX.playClick();
+      this.generateCertificate();
+    });
+
     document.getElementById('btn-view-ranks-result')?.addEventListener('click', () => {
       this.switchView('view-leaderboard');
       this.loadLeaderboard();
@@ -217,6 +222,15 @@ class QuizApp {
           const btn = document.querySelector(`[data-display-key="${targetDisplay}"]`);
           this.handleAnswer(matched.originalKey, btn);
         }
+      }
+    });
+
+    // Anti-Cheat Tab-Switch & Focus Monitor
+    document.addEventListener('visibilitychange', () => {
+      const activeView = document.querySelector('.app-view:not(.hidden)');
+      if (activeView && activeView.id === 'view-quiz' && document.hidden) {
+        this.tabSwitchCount = (this.tabSwitchCount || 0) + 1;
+        console.warn(`[Anti-Cheat Monitor] Tab switch #${this.tabSwitchCount} detected.`);
       }
     });
   }
@@ -559,6 +573,15 @@ class QuizApp {
       if (window.SFX) window.SFX.playWrong();
     }
 
+    // Mobile Haptic Vibration Feedback
+    if (navigator.vibrate) {
+      if (isCorrect) {
+        navigator.vibrate(this.stats.currentStreak >= 3 ? [40, 30, 70] : 40);
+      } else if (!isSkip) {
+        navigator.vibrate([80, 40, 80]);
+      }
+    }
+
     // Instant HUD stats refresh
     this.updateStatsUI();
 
@@ -595,6 +618,9 @@ class QuizApp {
   trigger60AlarmAlert() {
     if (window.SFX) {
       window.SFX.playAlarm();
+    }
+    if (navigator.vibrate) {
+      navigator.vibrate([200, 100, 200, 100, 300]);
     }
     const modal = document.getElementById('modal-60-alarm');
     const countEl = document.getElementById('alarm-q-count');
@@ -663,6 +689,7 @@ class QuizApp {
   }
 
   renderResults(data) {
+    this.latestResultSummary = data;
     this.switchView('view-results');
 
     document.getElementById('res-name').textContent = data.participant_name;
@@ -700,6 +727,126 @@ class QuizApp {
         });
       }, 300);
     }
+  }
+
+  generateCertificate() {
+    const data = this.latestResultSummary || {
+      participant_name: this.session?.participant_name || 'BMES Contestant',
+      student_id: this.session?.student_id || '2211000',
+      score: this.stats.score,
+      current_rank: 1,
+      total_participants: 1,
+      accuracy_percentage: 100
+    };
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 1600;
+    canvas.height = 1100;
+    const ctx = canvas.getContext('2d');
+
+    // 1. Background Gradient
+    const bgGrad = ctx.createLinearGradient(0, 0, 1600, 1100);
+    bgGrad.addColorStop(0, '#070d19');
+    bgGrad.addColorStop(0.5, '#0b1329');
+    bgGrad.addColorStop(1, '#070d19');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, 1600, 1100);
+
+    // 2. Glowing Borders
+    ctx.strokeStyle = '#06b6d4';
+    ctx.lineWidth = 10;
+    ctx.strokeRect(30, 30, 1540, 1040);
+
+    ctx.strokeStyle = '#0e7490';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(45, 45, 1510, 1010);
+
+    // Corner Ornaments
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillRect(20, 20, 40, 40);
+    ctx.fillRect(1540, 20, 40, 40);
+    ctx.fillRect(20, 1040, 40, 40);
+    ctx.fillRect(1540, 1040, 40, 40);
+
+    // 3. Header Text
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#06b6d4';
+    ctx.font = 'bold 28px "Space Grotesk", sans-serif';
+    ctx.fillText('CHITTAGONG UNIVERSITY OF ENGINEERING & TECHNOLOGY (CUET)', 800, 130);
+
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 36px "Space Grotesk", sans-serif';
+    ctx.fillText('BIOMEDICAL ENGINEERING SOCIETY (BMES)', 800, 180);
+
+    ctx.fillStyle = '#f59e0b';
+    ctx.font = 'bold 54px "Orbitron", "Space Grotesk", sans-serif';
+    ctx.fillText('CERTIFICATE OF PARTICIPATION', 800, 280);
+
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '24px "Space Grotesk", sans-serif';
+    ctx.fillText('This certificate is proudly awarded to', 800, 350);
+
+    // 4. Participant Name
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 64px "Orbitron", sans-serif';
+    ctx.fillText(data.participant_name.toUpperCase(), 800, 440);
+
+    // Student ID & Department
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 30px monospace';
+    ctx.fillText(`STUDENT ID: ${data.student_id}  |  DEPARTMENT OF BME`, 800, 500);
+
+    // Description
+    ctx.fillStyle = '#cbd5e1';
+    ctx.font = '22px "Space Grotesk", sans-serif';
+    ctx.fillText('for extraordinary performance in the CUET BMES 2-Minute Blitz Speed Quiz Challenge,', 800, 580);
+    ctx.fillText('demonstrating rapid analytical ability, speed, and accuracy across multidisciplinary questions.', 800, 615);
+
+    // 5. Stat Badges Box
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(300, 680, 1000, 140, 20);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = 'bold 36px "Orbitron", monospace';
+    ctx.fillText(`SCORE: ${data.score} PTS`, 460, 755);
+
+    ctx.fillStyle = '#34d399';
+    ctx.font = 'bold 36px "Orbitron", monospace';
+    ctx.fillText(`RANK: #${data.current_rank}`, 800, 755);
+
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 36px "Orbitron", monospace';
+    ctx.fillText(`ACCURACY: ${data.accuracy_percentage}%`, 1140, 755);
+
+    // 6. Signatures & Date
+    const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '20px "Space Grotesk", sans-serif';
+    ctx.fillText(`Date: ${today}`, 450, 940);
+    ctx.fillText('CUET BMES Executive Committee', 1150, 940);
+
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(350, 910);
+    ctx.lineTo(550, 910);
+    ctx.moveTo(1000, 910);
+    ctx.lineTo(1300, 910);
+    ctx.stroke();
+
+    // 7. Trigger Direct Download
+    const dataUrl = canvas.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = `CUET_BMES_Quiz_Certificate_${data.student_id}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 
   async loadLeaderboard(silent = false) {
