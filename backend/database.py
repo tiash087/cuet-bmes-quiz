@@ -12,9 +12,11 @@ DB_PATH = Path(__file__).parent.parent / "quiz.db"
 class PostgresCursorWrapper:
     def __init__(self, cursor):
         self._cursor = cursor
+        self._lastrowid = None
 
     def execute(self, query, params=None):
         q = query
+        self._lastrowid = None
         # 1. Replace SQLite ? with Postgres %s
         q = q.replace("?", "%s")
         # 2. Translate table creation datatypes
@@ -47,9 +49,26 @@ class PostgresCursorWrapper:
                 q, flags=re.IGNORECASE
             )
 
+        # 5. Handle RETURNING id for lastrowid
+        has_returning = False
+        if ("INSERT INTO participants" in q or "INSERT INTO questions" in q) and "RETURNING" not in q.upper():
+            q = q.rstrip(" ;") + " RETURNING id"
+            has_returning = True
+
         if params is not None:
-            return self._cursor.execute(q, params)
-        return self._cursor.execute(q)
+            self._cursor.execute(q, params)
+        else:
+            self._cursor.execute(q)
+
+        if has_returning:
+            try:
+                row = self._cursor.fetchone()
+                if row:
+                    self._lastrowid = row.get("id") if isinstance(row, dict) else row[0]
+            except:
+                pass
+
+        return self
 
     def fetchone(self):
         return self._cursor.fetchone()
@@ -59,10 +78,7 @@ class PostgresCursorWrapper:
 
     @property
     def lastrowid(self):
-        try:
-            return self._cursor.lastrowid
-        except:
-            return None
+        return self._lastrowid
 
     def close(self):
         try:

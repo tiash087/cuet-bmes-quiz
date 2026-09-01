@@ -112,7 +112,12 @@ def start_quiz(data: ParticipantRegister):
         INSERT INTO participants (name, student_id, department, batch, email, phone)
         VALUES (?, ?, ?, ?, ?, ?)
         """, (data.name.strip(), data.student_id.strip().upper(), data.department, data.batch, data.email, data.phone))
-        participant_id = cursor.lastrowid
+        participant_id = getattr(cursor, 'lastrowid', None)
+        if not participant_id:
+            cursor.execute("SELECT id FROM participants WHERE student_id = ?", (data.student_id.strip().upper(),))
+            p_row = cursor.fetchone()
+            if p_row:
+                participant_id = p_row["id"] if isinstance(p_row, dict) else p_row[0]
 
     # 2. Count active questions
     cursor.execute("SELECT COUNT(*) as count FROM questions WHERE is_active = 1")
