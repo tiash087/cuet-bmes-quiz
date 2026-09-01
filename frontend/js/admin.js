@@ -88,6 +88,11 @@ class AdminApp {
       this.resetLeaderboard();
     });
 
+    // Purge All Data (Permanent Clean Slate)
+    document.getElementById('btn-purge-all')?.addEventListener('click', () => {
+      this.purgeAllData();
+    });
+
     // Undo Leaderboard Wipe / Restore
     document.getElementById('btn-undo-leaderboard')?.addEventListener('click', () => {
       this.undoLeaderboard();
@@ -601,6 +606,33 @@ class AdminApp {
       this.showToast(`🗑️ Participant submission deleted (Archived).`, true);
     } catch (e) {
       alert("Delete session error: " + e.message);
+    }
+  }
+
+  async purgeAllData() {
+    if (!confirm("⚠️ PERMANENT PURGE WARNING:\n\nAre you sure you want to permanently delete ALL leaderboard records, participant registrations, and archives?\n\nThis will completely reset the leaderboard to 0 for a fresh live tournament!")) {
+      return;
+    }
+    
+    const verifyWord = prompt("Type 'DELETE' in capital letters to confirm permanent wipe:");
+    if (verifyWord !== "DELETE") {
+      alert("Purge cancelled. No records were deleted.");
+      return;
+    }
+
+    try {
+      const token = this.token || sessionStorage.getItem('admin_token') || 'BME_2122';
+      const res = await fetch(`${API_BASE}/api/admin/purge-all-data`, {
+        method: 'DELETE',
+        headers: { 'X-Admin-Token': token }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Purge failed");
+
+      this.loadResults();
+      this.showToast("💣 All leaderboard data permanently purged! Ready for tournament.", false);
+    } catch (e) {
+      alert("Purge error: " + e.message);
     }
   }
 

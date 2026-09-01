@@ -724,6 +724,18 @@ def delete_single_session(session_id: str, auth: bool = Depends(verify_admin_tok
         "message": f"Session #{session_id[:8]} removed from leaderboard (Archived for undo)."
     }
 
+@app.delete("/api/admin/purge-all-data")
+def purge_all_data(auth: bool = Depends(verify_admin_token)):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM quiz_sessions")
+    cursor.execute("DELETE FROM quiz_sessions_archive")
+    cursor.execute("DELETE FROM participants")
+    conn.commit()
+    conn.close()
+    return {"success": True, "message": "All leaderboard records and participants have been permanently purged. Ready for fresh tournament!"}
+
+
 @app.post("/api/admin/manual-entry")
 def manual_entry_participant(data: ManualParticipantEntry, auth: bool = Depends(verify_admin_token)):
     conn = get_db_connection()
